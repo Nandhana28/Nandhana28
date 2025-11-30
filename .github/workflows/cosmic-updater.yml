@@ -1,0 +1,40 @@
+name: Cosmic Profile Updater
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  cosmic-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Cosmic Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python Universe
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Cosmic Dependencies
+        run: |
+          pip install requests python-dateutil
+
+      - name: Run Galactic Analyzer
+        run: |
+          python .github/scripts/cosmic_analyzer.py
+
+      - name: Update Constellation Map
+        run: |
+          python .github/scripts/constellation_mapper.py
+
+      - name: Deploy Cosmic Updates
+        run: |
+          git config --local user.name "Cosmic Updater"
+          git config --local user.email "cosmic@nandhana28.dev"
+          git add .
+          git commit -m "🌌 Cosmic profile sync [$(date +%Y-%m-%d)]" || exit 0
+          git push
